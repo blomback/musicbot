@@ -48,11 +48,9 @@ app.get('/callback', function(req, res) {
 });
 
 app.post('/music', function(req, res, next) {
-	var message = req.body.text;
-	var tracks  = findTrack(message);
+	var tracks  = findTrack(req.body.text;);
 
 	if(tracks.length) {
-
 		spotifyApi.refreshAccessToken()
 		.then(function(data) {
 			spotifyApi.setAccessToken(data.body['access_token']);
@@ -69,16 +67,11 @@ app.post('/music', function(req, res, next) {
 			});
 
 		}, function(err) {
-      		return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
+      		return res.send('Could not refresh access token. Please login again.');
     	});
 	}
 });
 
-app.use(function (err, req, res, next) {
-  console.error(err.stack);
-  res.status(400).send(err.message);
-});
-
 app.listen(port, function () {
-  console.log('Slack bot listening on port ' + port);
+  console.log('Musicbot on port ' + port);
 });
