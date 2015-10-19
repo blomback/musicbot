@@ -48,7 +48,7 @@ app.get('/callback', function(req, res) {
 });
 
 app.post('/music', function(req, res, next) {
-	var message = req.body.message;
+	var message = req.body.text;
 	var tracks  = findTrack(message);
 
 	if(tracks.length) {
