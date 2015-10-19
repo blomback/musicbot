@@ -1,14 +1,56 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var musicbot = require('./musicbot');
+var express       = require('express');
+var bodyParser    = require('body-parser');
+var querystring   = require('querystring');
+var cookieParser  = require('cookie-parser');
+var SpotifyWebApi = require('spotify-web-api-node');
+
+var musicbot      = require('./musicbot');
+var settings      = require('./settings.json');
+var randomString  = require('./randomString');
+
+var spotifyApi = new SpotifyWebApi({
+  clientId     : settings.spotify.id,
+  clientSecret : settings.spotify.secret,
+  redirectUri  : settings.spotify.redirect
+});
 
 var app = express();
-var port = process.env.PORT || 3000;
+var port = settings.server.port || 3000;
+var stateKey = 'spotify_auth_state';
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function(req, res) {
-	res.status(200).send('Hello World!');
+	if (spotifyApi.getAccessToken()) {
+		return res.send('Logged in.');
+	}
+	return res.send('<a href="/login">Login</a>');
+});
+
+app.get('/login', function(req, res) {
+	var state = randomString(16);
+	var scopes = ['playlist-modify-private', 'playlist-modify-public'];
+	res.cookie(stateKey, state);
+	var authURL = spotifyApi.createAuthorizeURL(scopes, state);
+	res.redirect(authURL);
+});
+
+app.get('/callback', function(req, res) {
+	spotifyApi.authorizationCodeGrant(req.query.code)
+	.then(function(data) {
+		spotifyApi.setAccessToken(data.body['access_token']);
+		spotifyApi.setRefreshToken(data.body['refresh_token']);
+		return res.redirect('/');
+	}, function(err) {
+		return res.send(err);
+	});
+});
+
+app.use('/store', function(req, res, next) {
+  if (req.body.token !== settings.slack.token) {
+    return res.status(500).send('Nope');
+  }
+  next();
 });
 
 app.use(function (err, req, res, next) {
