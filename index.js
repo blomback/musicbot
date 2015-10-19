@@ -63,8 +63,8 @@ app.post('/music', function(req, res, next) {
     	});
 
 		spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, tracks)
-		then(function(data) {
-			return res.send('Track added: ' + track);
+		.then(function(data) {
+			return res.send('Track added');
 		}, function(err) {
 		  return res.send(err.message);
 		});
