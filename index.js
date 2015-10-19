@@ -18,6 +18,7 @@ var app = express();
 var port = settings.server.port || 3000;
 var stateKey = 'spotify_auth_state';
 
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function(req, res) {
@@ -46,20 +47,11 @@ app.get('/callback', function(req, res) {
 	});
 });
 
-app.use('/store', function(req, res, next) {
+app.use('/music', function(req, res, next) {
   if (req.body.token !== settings.slack.token) {
     return res.status(500).send('Nope');
   }
   next();
-});
-
-app.use(function (err, req, res, next) {
-  console.error(err.stack);
-  res.status(400).send(err.message);
-});
-
-app.listen(port, function () {
-  console.log('Slack bot listening on port ' + port);
 });
 
 app.post('/music', function(req, res, next) {
@@ -84,8 +76,18 @@ app.post('/music', function(req, res, next) {
 				  return res.send(err.message);
 				});
 			});
+
 		}, function(err) {
       		return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
     	});
 	}
+});
+
+app.use(function (err, req, res, next) {
+  console.error(err.stack);
+  res.status(400).send(err.message);
+});
+
+app.listen(port, function () {
+  console.log('Slack bot listening on port ' + port);
 });
