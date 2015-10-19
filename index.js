@@ -48,7 +48,7 @@ app.get('/callback', function(req, res) {
 });
 
 app.post('/music', function(req, res, next) {
-	var tracks  = findTrack(req.body.text;);
+	var tracks  = findTrack(req.body.text);
 
 	if(tracks.length) {
 		spotifyApi.refreshAccessToken()
