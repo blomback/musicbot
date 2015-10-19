@@ -4,7 +4,8 @@ module.exports = function(string) {
 	var tracks = [];
 
 	while ((matches = pattern.exec(string)) !== null) {
-		tracks.push(matches[3]);
+		var track = 'spotify:track:' + matches[3];
+		tracks.push(track);
 	}
 
 	return tracks;

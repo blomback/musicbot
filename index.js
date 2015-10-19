@@ -47,13 +47,6 @@ app.get('/callback', function(req, res) {
 	});
 });
 
-app.use('/music', function(req, res, next) {
-  if (req.body.token !== settings.slack.token) {
-    return res.status(500).send('Nope');
-  }
-  next();
-});
-
 app.post('/music', function(req, res, next) {
 	var message = req.body.message;
 	var tracks  = findTrack(message);
@@ -68,13 +61,11 @@ app.post('/music', function(req, res, next) {
 				spotifyApi.setRefreshToken(data.body['refresh_token']);
 			}
 
-			tracks.forEach(function(track) {
-				spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, ['spotify:track:' + track])
-				then(function(data) {
-					return res.send('Track added: ' + track);
-				}, function(err) {
-				  return res.send(err.message);
-				});
+			spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, tracks)
+			then(function(data) {
+				return res.send('Track added: ' + track);
+			}, function(err) {
+			  return res.send(err.message);
 			});
 
 		}, function(err) {
