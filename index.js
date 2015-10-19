@@ -1,6 +1,6 @@
+var fs            = require('fs');
 var express       = require('express');
 var bodyParser    = require('body-parser');
-var querystring   = require('querystring');
 var cookieParser  = require('cookie-parser');
 var SpotifyWebApi = require('spotify-web-api-node');
 
@@ -17,6 +17,13 @@ var spotifyApi = new SpotifyWebApi({
 var app = express();
 var port = settings.server.port || 3000;
 var stateKey = 'spotify_auth_state';
+
+var writeLog = function(text) {
+	fs.writeFile('error.log', text, function (err) {
+	    if (err)
+	        return console.log(err);
+	});
+};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -64,9 +71,9 @@ app.post('/music', function(req, res, next) {
 
 		spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, tracks)
 		.then(function(data) {
-			console.log(tracks);
+			return writeLog("Added " + tracks);
 		}, function(err) {
-		  console.log(err.message);
+		  return writeLog(err.message);
 		});
 	}
 });
