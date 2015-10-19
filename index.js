@@ -4,9 +4,9 @@ var querystring   = require('querystring');
 var cookieParser  = require('cookie-parser');
 var SpotifyWebApi = require('spotify-web-api-node');
 
-var musicbot      = require('./musicbot');
 var settings      = require('./settings.json');
 var randomString  = require('./randomString');
+var findTrack     = require('./findTrack');
 
 var spotifyApi = new SpotifyWebApi({
   clientId     : settings.spotify.id,
@@ -62,4 +62,30 @@ app.listen(port, function () {
   console.log('Slack bot listening on port ' + port);
 });
 
-app.post('/music', musicbot);
+app.post('/music', function(req, res, next) {
+	var message = req.body.message;
+	var tracks  = findTrack(message);
+
+	if(tracks.length) {
+
+		spotifyApi.refreshAccessToken()
+		.then(function(data) {
+			spotifyApi.setAccessToken(data.body['access_token']);
+
+			if(data.body['refresh_token']) {
+				spotifyApi.setRefreshToken(data.body['refresh_token']);
+			}
+
+			tracks.forEach(function(track) {
+				spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, ['spotify:track:' + track])
+				then(function(data) {
+					return res.send('Track added: ' + track);
+				}, function(err) {
+				  return res.send(err.message);
+				});
+			});
+		}, function(err) {
+      		return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
+    	});
+	}
+});
