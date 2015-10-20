@@ -65,16 +65,17 @@ app.post('/music', function(req, res, next) {
 			if(data.body['refresh_token']) {
 				spotifyApi.setRefreshToken(data.body['refresh_token']);
 			}
+
+			spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, tracks)
+			.then(function(data) {
+				return writeLog("Added " + tracks);
+			}, function(err) {
+			  return writeLog(err.message);
+			});
+
 		}, function(err) {
       		return res.send('Could not refresh access token. Please login again.');
     	});
-
-		spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, tracks)
-		.then(function(data) {
-			return writeLog("Added " + tracks);
-		}, function(err) {
-		  return writeLog(err.message);
-		});
 	}
 });
 
