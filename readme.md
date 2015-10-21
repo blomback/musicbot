@@ -2,23 +2,14 @@
 Slack bot who adds posted songs to a playlist.
 
 ## Installation
-Create settings.json and fill in with your details from Slack Integrations and your Spotify App. Then create a Slack integration that posts to _your url_/music.
+Create .env and fill in with your details from Slack Integrations and your Spotify App. Then create a Slack integration that posts to _your url_/music.
 
-### settings.json
+### .env
 ```
-{
-	"server": {
-		"port": <server port>
-	},
-	"slack": {
-		"token": "<slack token>"
-	},
-	"spotify": {
-		"username": "<spotify username>",
-		"id": "<spotify app id>",
-		"secret": "<spotify app secret>",
-		"redirect": "<spotify callback uri>",
-		"playlist_id": "<spotify playlist id>"
-	}
-}
+SERVER_PORT=
+SPOTIFY_USERNAME=
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
+SPOTIFY_REDIRECT_URI=yourapp.com/callback
+SPOTIFY_PLAYLIST_ID=
 ```
