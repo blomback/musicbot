@@ -1,21 +1,21 @@
+var dotenv        = require('dotenv').load();
 var fs            = require('fs');
 var express       = require('express');
 var bodyParser    = require('body-parser');
 var cookieParser  = require('cookie-parser');
 var SpotifyWebApi = require('spotify-web-api-node');
 
-var settings      = require('./settings.json');
 var randomString  = require('./randomString');
 var findTrack     = require('./findTrack');
 
 var spotifyApi = new SpotifyWebApi({
-  clientId     : settings.spotify.id,
-  clientSecret : settings.spotify.secret,
-  redirectUri  : settings.spotify.redirect
+  clientId     : process.env.SPOTIFY_CLIENT_ID,
+  clientSecret : process.env.SPOTIFY_CLIENT_SECRET,
+  redirectUri  : process.env.SPOTIFY_REDIRECT_URI
 });
 
 var app = express();
-var port = settings.server.port || 3000;
+var port = process.env.SERVER_PORT || 3000;
 var stateKey = 'spotify_auth_state';
 
 var writeLog = function(text) {
@@ -66,7 +66,7 @@ app.post('/music', function(req, res, next) {
 				spotifyApi.setRefreshToken(data.body['refresh_token']);
 			}
 
-			spotifyApi.addTracksToPlaylist(settings.spotify.username, settings.spotify.playlist_id, tracks)
+			spotifyApi.addTracksToPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, tracks)
 			.then(function(data) {
 				return writeLog("Added " + tracks);
 			}, function(err) {
