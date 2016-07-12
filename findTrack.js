@@ -4,14 +4,7 @@ module.exports = function(string) {
 	var tracks = [];
 
 	while ((matches = pattern.exec(string)) !== null) {
-		var trackid;
-
-		if (matches[3]) {
-			trackid = matches[3];
-		}
-		else if (matches[4]) {
-			trackid = matches[4];
-		}
+		var trackid = matches[3] ? matches[3] : matches[4];
 		var track = 'spotify:track:' + trackid;
 		tracks.push(track);
 	};
